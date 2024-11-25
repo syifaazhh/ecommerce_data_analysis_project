@@ -98,148 +98,122 @@ st.header("Pertanyaan Bisnis")
 
 # P1: Jumlah Order Berdasarkan State
 with st.expander("P1: Jumlah Order Berdasarkan State"):
-    # Hitung jumlah order berdasarkan state
-    order_per_state = order_customer_df.groupby('customer_state')['order_id'].count().reset_index().rename(columns={'order_id': 'total_order'})
-    order_per_state = order_per_state.sort_values(by='total_order', ascending=False).head(5)
-    
-    # Highlight warna biru pastel untuk bar tertinggi
-    order_per_state['color'] = ['#5B9BD5' if x == order_per_state['total_order'].max() else '#A2C4E4' for x in order_per_state['total_order']]
-
-    # Plot bar chart
-    fig, ax = plt.subplots(figsize=(10, 6))
-    sns.barplot(data=order_per_state, x='customer_state', y='total_order', palette=order_per_state['color'], ax=ax)
-    plt.title("Jumlah Order Berdasarkan State")
-    plt.xlabel("State")
-    plt.ylabel("Jumlah Order")
-    st.pyplot(fig)
+    tab1, tab2 = st.tabs(['Terbanyak', 'Tersedikit'])
+    with tab1:
+        top_state_df = order_per_state_df.sort_values(by='total_order', ascending=False).head(5)
+        fig, ax = plt.subplots(figsize=(10, 6))
+        sns.barplot(data=top_state_df, x='state', y='total_order', ax=ax, palette="Blues_d")
+        plt.title("Top States Berdasarkan Order")
+        st.pyplot(fig)
+    with tab2:
+        worst_state_df = order_per_state_df.sort_values(by='total_order').head(5)
+        fig, ax = plt.subplots(figsize=(10, 6))
+        sns.barplot(data=worst_state_df, x='state', y='total_order', ax=ax, palette="Reds_d")
+        plt.title("State dengan Order Tersedikit")
+        st.pyplot(fig)
 
 # P2: Pertumbuhan Order per Tahun
 with st.expander("P2: Pertumbuhan Order per Tahun"):
-    order_per_year = orders_df.groupby('year_of_purchase')['order_id'].count().reset_index().rename(columns={'order_id': 'total_order'})
-
     fig, ax = plt.subplots(figsize=(10, 6))
-    sns.lineplot(data=order_per_year, x='year_of_purchase', y='total_order', marker="o", color="#5B9BD5", ax=ax)
-    plt.title("Pertumbuhan Order per Tahun")
+    sns.lineplot(data=order_per_year_df, x='year_of_purchase', y='total_order', marker="o", ax=ax)
+    plt.title("Jumlah Order per Tahun")
     plt.xlabel("Tahun")
     plt.ylabel("Jumlah Order")
     st.pyplot(fig)
 
 # P3: Customer Active vs Inactive
 with st.expander("P3: Customer Active vs Inactive"):
-    customer_status = customers_df.copy()
-    customer_status['status'] = customer_status['customer_id'].isin(orders_df['customer_id']).map({True: 'Active', False: 'Inactive'})
-    status_count = customer_status['status'].value_counts()
-
     fig, ax = plt.subplots(figsize=(10, 6))
-    ax.pie(status_count, labels=status_count.index, autopct='%1.1f%%', colors=["#5B9BD5", "#A2C4E4"])
-    plt.title("Customer Active vs Inactive")
+    ax.pie(customer_status_df['total_customer'], labels=customer_status_df['status'], autopct='%1.1f%%', explode=(0.1, 0), colors=["#72BCD4", "#D3D3D3"])
+    plt.title("Rasio Customer Active vs Inactive")
     st.pyplot(fig)
 
 # P4: Distribusi Rating Ulasan
 with st.expander("P4: Distribusi Rating Ulasan"):
-    review_scores = order_reviews_df['review_score'].value_counts().reset_index().rename(columns={'index': 'review_score', 'review_score': 'total_review'})
-    review_scores['color'] = ['#5B9BD5' if x == review_scores['total_review'].max() else '#A2C4E4' for x in review_scores['total_review']]
-
     fig, ax = plt.subplots(figsize=(10, 6))
-    sns.barplot(data=review_scores, x='review_score', y='total_review', palette=review_scores['color'], ax=ax)
+    sns.barplot(data=review_score_df, x='review_score', y='total_review', palette="RdYlGn", ax=ax)
     plt.title("Distribusi Rating Ulasan")
     plt.xlabel("Rating")
-    plt.ylabel("Jumlah Ulasan")
+    plt.ylabel("Total Review")
     st.pyplot(fig)
 
 # P5: Kategori Produk Terpopuler
 with st.expander("P5: Kategori Produk Terpopuler"):
-    popular_categories = order_items_df.groupby('product_category_name_english')['order_id'].count().reset_index().rename(columns={'order_id': 'total_order'})
-    popular_categories = popular_categories.sort_values(by='total_order', ascending=False).head(5)
-    popular_categories['color'] = ['#5B9BD5' if x == popular_categories['total_order'].max() else '#A2C4E4' for x in popular_categories['total_order']]
-
+    best_category_df = order_product_category_df.sort_values(by='total_order', ascending=False).head(5)
     fig, ax = plt.subplots(figsize=(10, 6))
-    sns.barplot(data=popular_categories, x='product_category_name_english', y='total_order', palette=popular_categories['color'], ax=ax)
-    plt.title("Kategori Produk Terpopuler")
+    sns.barplot(data=best_category_df, x='product_category_name_english', y='total_order', palette="coolwarm", ax=ax)
+    plt.title("Top 5 Kategori Produk")
     plt.xlabel("Kategori Produk")
     plt.ylabel("Jumlah Order")
     st.pyplot(fig)
 
 # P6: Metode Pembayaran Paling Sering Digunakan
 with st.expander("P6: Metode Pembayaran Paling Sering Digunakan"):
-    payment_methods = order_payments_df['payment_type'].value_counts().reset_index().rename(columns={'index': 'payment_type', 'payment_type': 'count'})
-
+    payment_methods = order_payments_df['payment_type'].value_counts().reset_index()
+    payment_methods.columns = ['payment_type', 'count']
     fig, ax = plt.subplots(figsize=(10, 6))
-    sns.barplot(data=payment_methods, x='payment_type', y='count', color="#5B9BD5", ax=ax)
-    plt.title("Metode Pembayaran Paling Sering Digunakan")
-    plt.xlabel("Metode Pembayaran")
-    plt.ylabel("Jumlah Penggunaan")
+    sns.barplot(data=payment_methods, x='count', y='payment_type', palette="Purples_d", ax=ax)
+    plt.title("Distribusi Metode Pembayaran")
+    plt.xlabel("Jumlah")
+    plt.ylabel("Metode Pembayaran")
     st.pyplot(fig)
 
 # P7: Waktu Pengiriman Berdasarkan Metode Pembayaran
-with st.expander("P7: Waktu Pengiriman Berdasarkan Metode Pembayaran"):
-    orders_df['delivery_time'] = (orders_df['order_delivered_customer_date'] - orders_df['order_purchase_timestamp']).dt.days
-    payment_delivery = pd.merge(order_payments_df, orders_df[['order_id', 'delivery_time']], on='order_id', how='left')
-
+with st.expander("P7: Hubungan Metode Pembayaran dan Waktu Pengiriman"):
+    orders_payments = pd.merge(order_payments_df, orders_df, on='order_id', how='left')
+    orders_payments['delivery_time'] = (orders_payments['order_delivered_customer_date'] - orders_payments['order_purchase_timestamp']).dt.days
     fig, ax = plt.subplots(figsize=(10, 6))
-    sns.boxplot(data=payment_delivery, x='payment_type', y='delivery_time', palette=["#5B9BD5", "#A2C4E4"], ax=ax)
+    sns.boxplot(data=orders_payments, x='payment_type', y='delivery_time', palette="coolwarm", ax=ax)
     plt.title("Waktu Pengiriman Berdasarkan Metode Pembayaran")
     plt.xlabel("Metode Pembayaran")
     plt.ylabel("Waktu Pengiriman (Hari)")
     st.pyplot(fig)
 
-# P8: Perbedaan Waktu Pengiriman Berdasarkan Rating Ulasan
-with st.expander("P8: Waktu Pengiriman Berdasarkan Rating Ulasan"):
-    orders_reviews = pd.merge(order_reviews_df, orders_df[['order_id', 'delivery_time']], on='order_id', how='left')
-
+# P8: Distribusi Rating Ulasan
+with st.expander("P8: Distribusi Rating Ulasan"):
     fig, ax = plt.subplots(figsize=(10, 6))
-    sns.boxplot(data=orders_reviews, x='review_score', y='delivery_time', palette=["#5B9BD5", "#A2C4E4"], ax=ax)
-    plt.title("Waktu Pengiriman Berdasarkan Rating Ulasan")
+    sns.barplot(data=review_score_df, x='review_score', y='total_review', palette="RdYlGn", ax=ax)
+    plt.title("Distribusi Rating Ulasan")
     plt.xlabel("Rating")
+    plt.ylabel("Jumlah Ulasan")
+    st.pyplot(fig)
+
+# P9: Perbedaan Waktu Pengiriman Berdasarkan Ulasan
+with st.expander("P9: Waktu Pengiriman Berdasarkan Ulasan Positif vs Negatif"):
+    orders_reviews = pd.merge(order_reviews_df, orders_df, on='order_id', how='left')
+    orders_reviews['delivery_time'] = (orders_reviews['order_delivered_customer_date'] - orders_reviews['order_purchase_timestamp']).dt.days
+    orders_reviews['sentiment'] = orders_reviews['review_score'].apply(lambda x: "Positive" if x >= 4 else "Negative")
+    fig, ax = plt.subplots(figsize=(10, 6))
+    sns.boxplot(data=orders_reviews, x='sentiment', y='delivery_time', palette="coolwarm", ax=ax)
+    plt.title("Waktu Pengiriman Berdasarkan Sentimen Ulasan")
+    plt.xlabel("Sentimen Ulasan")
     plt.ylabel("Waktu Pengiriman (Hari)")
     st.pyplot(fig)
 
-# P9: Rata-Rata Waktu Pengiriman Berdasarkan Kategori Produk
-with st.expander("P9: Rata-Rata Waktu Pengiriman Berdasarkan Kategori Produk"):
-    category_delivery = order_items_df.groupby('product_category_name_english')['delivery_time'].mean().reset_index()
-
-    fig, ax = plt.subplots(figsize=(10, 6))
-    sns.barplot(data=category_delivery, x='delivery_time', y='product_category_name_english', color="#5B9BD5", ax=ax)
+# P10: Rata-Rata Waktu Pengiriman Berdasarkan Kategori Produk
+with st.expander("P10: Rata-Rata Waktu Pengiriman Berdasarkan Kategori Produk"):
+    order_items_product_df['delivery_time'] = (
+        pd.to_datetime(order_items_product_df['order_delivered_customer_date']) -
+        pd.to_datetime(order_items_product_df['order_purchase_timestamp'])
+    ).dt.days
+    avg_delivery = order_items_product_df.groupby('product_category_name_english')['delivery_time'].mean().sort_values(ascending=False).head(10)
+    fig, ax = plt.subplots(figsize=(12, 8))
+    sns.barplot(y=avg_delivery.index, x=avg_delivery.values, palette="coolwarm", ax=ax)
     plt.title("Rata-Rata Waktu Pengiriman Berdasarkan Kategori Produk")
     plt.xlabel("Waktu Pengiriman (Hari)")
     plt.ylabel("Kategori Produk")
     st.pyplot(fig)
 
-# P10: Keterlambatan Pengiriman Berdasarkan Kategori Produk
-with st.expander("P10: Keterlambatan Pengiriman Berdasarkan Kategori Produk"):
-    order_items_df['delivery_time'] = (
-        pd.to_datetime(order_items_df['order_delivered_customer_date']) -
-        pd.to_datetime(order_items_df['order_purchase_timestamp'])
+# P11: Keterlambatan Pengiriman Berdasarkan Kategori Produk
+with st.expander("P11: Keterlambatan Pengiriman Berdasarkan Kategori Produk"):
+    order_items_product_df['is_late'] = order_items_product_df['delivery_time'] > (
+        pd.to_datetime(order_items_product_df['order_estimated_delivery_date']) -
+        pd.to_datetime(order_items_product_df['order_purchase_timestamp'])
     ).dt.days
-    order_items_df['is_late'] = (
-        pd.to_datetime(order_items_df['order_delivered_customer_date']) >
-        pd.to_datetime(order_items_df['order_estimated_delivery_date'])
-    )
-    late_delivery_counts = order_items_df[order_items_df['is_late']].groupby('product_category_name_english').size().reset_index(name='late_count')
-    late_delivery_counts = late_delivery_counts.sort_values(by='late_count', ascending=False).head(10)
-
-    # Highlighting the highest bar
-    late_delivery_counts['color'] = ['#5B9BD5' if x == late_delivery_counts['late_count'].max() else '#A2C4E4' for x in late_delivery_counts['late_count']]
-
+    late_delivery = order_items_product_df[order_items_product_df['is_late']].groupby('product_category_name_english').size().sort_values(ascending=False).head(10)
     fig, ax = plt.subplots(figsize=(12, 8))
-    sns.barplot(data=late_delivery_counts, x='late_count', y='product_category_name_english', palette=late_delivery_counts['color'], ax=ax)
+    sns.barplot(y=late_delivery.index, x=late_delivery.values, palette="Reds_d", ax=ax)
     plt.title("Keterlambatan Pengiriman Berdasarkan Kategori Produk")
     plt.xlabel("Jumlah Keterlambatan")
-    plt.ylabel("Kategori Produk")
-    st.pyplot(fig)
-
-# P11: Rata-Rata Rating Berdasarkan Kategori Produk
-with st.expander("P11: Rata-Rata Rating Berdasarkan Kategori Produk"):
-    product_ratings = pd.merge(order_items_df, order_reviews_df, on='order_id', how='left')
-    avg_rating_per_category = product_ratings.groupby('product_category_name_english')['review_score'].mean().reset_index()
-    avg_rating_per_category = avg_rating_per_category.sort_values(by='review_score', ascending=False).head(10)
-
-    # Highlighting the highest bar
-    avg_rating_per_category['color'] = ['#5B9BD5' if x == avg_rating_per_category['review_score'].max() else '#A2C4E4' for x in avg_rating_per_category['review_score']]
-
-    fig, ax = plt.subplots(figsize=(12, 8))
-    sns.barplot(data=avg_rating_per_category, x='review_score', y='product_category_name_english', palette=avg_rating_per_category['color'], ax=ax)
-    plt.title("Rata-Rata Rating Berdasarkan Kategori Produk")
-    plt.xlabel("Rata-Rata Rating")
     plt.ylabel("Kategori Produk")
     st.pyplot(fig)
