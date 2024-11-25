@@ -87,19 +87,11 @@ with col3:
 
 col4, col5, col6 = st.columns(3)
 with col4:
-    st.metric(label="Total Revenue", value=f"${order_items_df['price'].sum():,.2f}")
-with col5:
     st.metric(label="Average Order Value", value=f"${order_items_df.groupby('order_id')['price'].sum().mean():,.2f}")
-with col6:
+with col5:
     st.metric(label="Total Sellers", value=sellers_df.seller_id.nunique())
-
-col7, col8, col9 = st.columns(3)
-with col7:
-    st.metric(label="Total Reviews", value=order_reviews_df.shape[0])
-with col8:
+with col6:
     st.metric(label="Average Review Score", value=f"{order_reviews_df['review_score'].mean():.2f}")
-with col9:
-    st.metric(label="Top Product Category", value=order_items_df['product_category_name_english'].value_counts().idxmax())
 
 # Visualisasi
 st.header("Pertanyaan Bisnis")
