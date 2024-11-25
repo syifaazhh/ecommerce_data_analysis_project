@@ -103,10 +103,14 @@ with st.expander("P1: Jumlah Order Berdasarkan State"):
 # P2: Pertumbuhan Order per Tahun
 with st.expander("P2: Pertumbuhan Order per Tahun"):
     fig, ax = plt.subplots(figsize=(10, 6))
-    sns.lineplot(data=order_per_year_df, x='year_of_purchase', y='total_order', marker="o", ax=ax)
+    
+    # Pastikan kolom 'year_of_purchase' berupa string agar tidak ada koma-koma
+    sns.lineplot(data=order_per_year_df, x=order_per_year_df['year_of_purchase'].astype(str), y='total_order', marker="o", ax=ax)
+    
     plt.title("Jumlah Order per Tahun")
     plt.xlabel("Tahun")
     plt.ylabel("Jumlah Order")
+    
     st.pyplot(fig)
 
 # P3: Customer Active vs Inactive
