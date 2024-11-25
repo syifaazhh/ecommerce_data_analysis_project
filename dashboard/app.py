@@ -98,10 +98,14 @@ st.header("Pertanyaan Bisnis")
 
 # P1: Jumlah Order Berdasarkan State
 with st.expander("P1: Jumlah Order Berdasarkan State"):
-    order_per_state = orders_df.groupby('customer_state')['order_id'].count().reset_index().rename(columns={'order_id': 'total_order'})
+    # Hitung jumlah order berdasarkan state
+    order_per_state = order_customer_df.groupby('customer_state')['order_id'].count().reset_index().rename(columns={'order_id': 'total_order'})
     order_per_state = order_per_state.sort_values(by='total_order', ascending=False).head(5)
+    
+    # Highlight warna biru pastel untuk bar tertinggi
     order_per_state['color'] = ['#5B9BD5' if x == order_per_state['total_order'].max() else '#A2C4E4' for x in order_per_state['total_order']]
 
+    # Plot bar chart
     fig, ax = plt.subplots(figsize=(10, 6))
     sns.barplot(data=order_per_state, x='customer_state', y='total_order', palette=order_per_state['color'], ax=ax)
     plt.title("Jumlah Order Berdasarkan State")
