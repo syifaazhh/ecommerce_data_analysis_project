@@ -162,37 +162,3 @@ ax.set_ylabel('')
 plt.xticks(rotation=45)
 plt.tight_layout()
 st.pyplot(fig)
-
-st.subheader("P4: Top 10 State dengan Jumlah Pelanggan Terbanyak")
-
-# Menggabungkan orders_df dengan customers_df untuk mendapatkan data state pelanggan
-merged_order_customer_df = pd.merge(orders_df, customers_df, on='customer_id', how='left')
-
-# Menghitung jumlah pelanggan unik per state
-top_10_customers = (
-    merged_order_customer_df.groupby('customer_state')['customer_id']
-    .nunique()
-    .sort_values(ascending=False)
-    .head(10)
-    .reset_index()
-)
-top_10_customers.rename(columns={'customer_id': 'total_customer'}, inplace=True)
-
-# Menentukan warna untuk state dengan jumlah pelanggan tertinggi
-top_color = ['#5B9BD5' if i == 0 else '#A2C4E4' for i in range(len(top_10_customers))]
-
-# Plot
-fig, ax = plt.subplots(figsize=(12, 6))
-sns.barplot(
-    x='customer_state',
-    y='total_customer',
-    data=top_10_customers,
-    palette=top_color,
-    ax=ax
-)
-ax.set_title('Top Customer States by Total Customer')
-ax.set_xlabel('')
-ax.set_ylabel('')
-plt.xticks(rotation=45, ha='right')
-plt.tight_layout()
-st.pyplot(fig)
