@@ -122,3 +122,19 @@ plt.title("Top Kategori Produk Berdasarkan Jumlah Pesanan")
 ax.set_xlabel('')
 ax.set_ylabel('')
 st.pyplot(fig)
+
+st.subheader("P2: Tren Penjualan Tahunan")
+# Hitung jumlah pesanan per tahun
+orders_df['purchase_year'] = orders_df['order_purchase_timestamp'].dt.year
+orders_per_year = orders_df.groupby('purchase_year')['order_id'].count().reset_index()
+orders_per_year.columns = ['purchase_year', 'total_orders']
+
+# Plot
+fig, ax = plt.subplots(figsize=(12, 6))
+sns.lineplot(data=orders_per_year, x='purchase_year', y='total_orders', marker='o', ax=ax)
+ax.set_title('Total Orders per Year')
+ax.set_xlabel('')
+ax.set_ylabel('')
+ax.set_xticks([2016, 2017, 2018])
+plt.tight_layout()
+st.pyplot(fig)
