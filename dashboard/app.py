@@ -111,7 +111,7 @@ st.subheader("P1: Kategori Produk Terpopuler Berdasarkan Jumlah Pesanan")
 top_categories = order_product_category_df.sort_values(by='total_order', ascending=False).head(5)
 
 fig, ax = plt.subplots(figsize=(10, 6))
-sns.barplot(data=top_categories, x='product_category_name_english', y='total_order', palette=['#5B9BD5' if i == 0 else '#A2C4E4' for i in range(len(top_categories))], ax=ax)
+sns.barplot(data=top_categories, x='total_order', y='product_category_name_english',  palette=['#5B9BD5' if i == 0 else '#A2C4E4' for i in range(len(top_categories))], ax=ax)
 plt.title("Top Kategori Produk Berdasarkan Jumlah Pesanan")
 plt.xticks(rotation=45)
 st.pyplot(fig)
