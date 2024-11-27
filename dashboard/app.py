@@ -77,21 +77,11 @@ st.title("E-Commerce Dashboard")
 st.header("Key Performance Indicators (KPI)")
 
 # KPI metrics
-col1, col2, col3 = st.columns(3)
-with col1:
-    st.metric(label="Total Customers", value=customers_df.customer_id.nunique())
-with col2:
-    st.metric(label="Total Orders", value=orders_df.shape[0])
-with col3:
-    st.metric(label="Unique Products Sold", value=order_items_df.product_id.nunique())
-
-col4, col5, col6 = st.columns(3)
-with col4:
-    st.metric(label="Average Order Value", value=f"${order_items_df.groupby('order_id')['price'].sum().mean():,.2f}")
-with col5:
-    st.metric(label="Total Sellers", value=sellers_df.seller_id.nunique())
-with col6:
-    st.metric(label="Average Review Score", value=f"{order_reviews_df['review_score'].mean():.2f}")
+col1, col2, col3, col4 = st.columns(4)
+col1.metric("Total Customers", total_customers)
+col2.metric("Total Orders", total_orders)
+col3.metric("Total Sales", f"${total_sales:,.2f}")
+col4.metric("Avg. Sales per Order", f"${avg_sales_per_order:,.2f}")
 
 # Visualisasi
 st.header("Pertanyaan Bisnis")
