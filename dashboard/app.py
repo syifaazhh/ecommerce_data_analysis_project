@@ -71,6 +71,17 @@ order_product_category_df = order_items_product_df.groupby('product_category_nam
     'order_id': 'count'
 }).reset_index().rename(columns={'order_id': 'total_order'})
 
+# Sidebar Filters
+st.sidebar.header("Filter Options")
+date_range = st.sidebar.date_input("Select Date Range", 
+                                   value=(orders_df['order_purchase_timestamp'].min(), orders_df['order_purchase_timestamp'].max()))
+
+# Apply Date Filter
+filtered_orders = orders_df[
+    (orders_df['order_purchase_timestamp'] >= pd.to_datetime(date_range[0])) &
+    (orders_df['order_purchase_timestamp'] <= pd.to_datetime(date_range[1]))
+]
+
 # Streamlit Dashboard
 st.title("E-Commerce Dashboard")
 
