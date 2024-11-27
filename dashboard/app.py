@@ -142,9 +142,16 @@ st.pyplot(fig)
 
 st.write("b. Tren Penjualan Bulanan")
 # Hitung jumlah pesanan per bulan
-orders_df['purchase_month'] = orders_df['order_purchase_timestamp'].dt.to_period('M').astype(str)
+orders_df['purchase_month'] = orders_df['order_purchase_timestamp'].dt.month
 orders_per_month = orders_df.groupby('purchase_month')['order_id'].count().reset_index()
 orders_per_month.columns = ['purchase_month', 'total_orders']
+
+# Mapping angka bulan menjadi nama bulan
+month_names = {
+    1: 'January', 2: 'Februari=y', 3: 'March', 4: 'April', 5: 'May', 6: 'June',
+    7: 'July', 8: 'August', 9: 'September', 10: 'October', 11: 'November', 12: 'December'
+}
+orders_per_month['purchase_month'] = orders_per_month['purchase_month'].map(month_names)
 
 # Plot
 fig, ax = plt.subplots(figsize=(15, 6))
