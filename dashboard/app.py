@@ -167,4 +167,115 @@ plt.tight_layout()
 st.pyplot(fig)
 st.write("Bulan Agustus memiliki volume pesanan tertinggi, sementara bulan September menunjukkan penurunan tajam.")
 
+st.subheader("P3: Produk dengan Total Pendapatan Tertinggi")
+
+# Menghitung total pendapatan per kategori produk
+merged_df = pd.merge(order_items_df, products_df, on='product_id', how='left')
+merged_df = pd.merge(merged_df, product_category_name_translations_df, on='product_category_name', how='left')
+merged_df['total_revenue'] = merged_df['price'] * merged_df['order_item_id']
+revenue_per_category = merged_df.groupby('product_category_name_english')['total_revenue'].sum().reset_index()
+revenue_per_category = revenue_per_category.sort_values(by='total_revenue', ascending=False).head(10)
+
+# Menentukan warna
+revenue_per_category['color'] = ['#5B9BD5' if i == 0 else '#A2C4E4' for i in range(len(revenue_per_category))]
+
+# Plot
+fig, ax = plt.subplots(figsize=(12, 6))
+sns.barplot(
+    x='total_revenue',
+    y='product_category_name_english',
+    data=revenue_per_category,
+    palette=revenue_per_category['color'],
+    ax=ax
+)
+ax.set_title('Top 10 Kategori Produk Berdasarkan Total Pendapatan')
+ax.set_xlabel('')
+ax.set_ylabel('')
+plt.tight_layout()
+st.pyplot(fig)
+st.write("health_beauty menghasilkan pendapatan tertinggi.")
+
+st.subheader("P4: Dari Daerah Mana Pelanggan Terbanyak Berasal?")
+
+# Menghitung jumlah pelanggan unik per state
+merged_order_customer_df = pd.merge(orders_df, customers_df, on='customer_id', how='left')
+top_10_customers = (
+    merged_order_customer_df.groupby('customer_state')['customer_id']
+    .nunique()
+    .sort_values(ascending=False)
+    .head(10)
+    .reset_index()
+)
+top_10_customers.rename(columns={'customer_id': 'total_customers'}, inplace=True)
+
+# Menentukan warna
+top_10_customers['color'] = ['#5B9BD5' if i == 0 else '#A2C4E4' for i in range(len(top_10_customers))]
+
+# Plot
+fig, ax = plt.subplots(figsize=(12, 6))
+sns.barplot(
+    x='total_customers',
+    y='customer_state',
+    data=top_10_customers,
+    palette=top_10_customers['color'],
+    ax=ax
+)
+ax.set_title('Top 10 State Berdasarkan Jumlah Pelanggan')
+ax.set_xlabel('')
+ax.set_ylabel('')
+plt.tight_layout()
+st.pyplot(fig)
+st.write("SP (São Paulo) memiliki basis pelanggan terbesar.")
+
+st.subheader("P5: Metode Pembayaran yang Paling Sering Digunakan")
+
+# Menghitung jumlah penggunaan metode pembayaran
+payment_method_counts = order_payments_df['payment_type'].value_counts().reset_index()
+payment_method_counts.columns = ['payment_type', 'count']
+
+# Menentukan warna
+payment_method_counts['color'] = ['#5B9BD5' if i == 0 else '#A2C4E4' for i in range(len(payment_method_counts))]
+
+# Plot
+fig, ax = plt.subplots(figsize=(8, 6))
+sns.barplot(
+    x='count',
+    y='payment_type',
+    data=payment_method_counts,
+    palette=payment_method_counts['color'],
+    ax=ax
+)
+ax.set_title('Distribusi Metode Pembayaran yang Paling Sering Digunakan')
+ax.set_xlabel('')
+ax.set_ylabel('')
+plt.tight_layout()
+st.pyplot(fig)
+st.write("credit_card adalah metode pembayaran yang paling populer.")
+
+st.subheader("P6: Distribusi Rating Ulasan Pelanggan")
+
+# Menghitung jumlah ulasan berdasarkan rating
+review_distribution = order_reviews_df['review_score'].value_counts().reset_index()
+review_distribution.columns = ['review_score', 'count']
+review_distribution = review_distribution.sort_values(by='review_score', ascending=True)
+
+# Menentukan warna
+review_distribution['color'] = ['#5B9BD5' if i == review_distribution['count'].idxmax() else '#A2C4E4' for i in range(len(review_distribution))]
+
+# Plot
+fig, ax = plt.subplots(figsize=(12, 6))
+sns.barplot(
+    x='review_score',
+    y='count',
+    data=review_distribution,
+    palette=review_distribution['color'],
+    ax=ax
+)
+ax.set_title('Distribusi Rating Ulasan Pelanggan')
+ax.set_xlabel('Rating')
+ax.set_ylabel('Jumlah Ulasan')
+plt.tight_layout()
+st.pyplot(fig)
+st.write("Sebagian besar ulasan diberi nilai 5, menunjukkan kepuasan pelanggan yang tinggi.")
+
 st.caption('Copyright (C) Syifa Azzahirah. 2024')
