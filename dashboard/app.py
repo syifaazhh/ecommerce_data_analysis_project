@@ -108,7 +108,7 @@ with col6:
 st.header("Pertanyaan Bisnis")
 
 st.subheader("P1: Kategori Produk Terpopuler Berdasarkan Jumlah Pesanan")
-top_categories = order_product_category_df.sort_values(by='total_order', ascending=False).head(5)
+top_categories = order_product_category_df.sort_values(by='total_order', ascending=False).head(10)
 
 fig, ax = plt.subplots(figsize=(10, 6))
 sns.barplot(
