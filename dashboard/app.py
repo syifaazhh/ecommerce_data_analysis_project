@@ -168,40 +168,49 @@ st.write("Visualisasi kategori produk dengan total pendapatan tertinggi.")
 
 # Menggabungkan data untuk perhitungan total pendapatan
 merged_df = pd.merge(order_items_df, products_df, on='product_id', how='left')
+
+# Periksa kolom dari dataset penggabungan
+st.write("Kolom setelah gabung dengan products_df:", merged_df.columns)
+
+# Gabungkan dengan product_category_name_translations_df
 merged_df = pd.merge(merged_df, product_category_name_translations_df, on='product_category_name', how='left')
 
-# Mengganti nama kolom hasil merge untuk konsistensi
-merged_df.rename(columns={'product_category_name_translations': 'product_category_name_english'}, inplace=True)
+# Periksa apakah kolom product_category_name_english ada
+st.write("Kolom setelah gabung dengan translations_df:", merged_df.columns)
 
-# Pastikan tidak ada nilai NaN di kolom 'price' atau 'order_item_id'
-merged_df['price'] = merged_df['price'].fillna(0)
-merged_df['order_item_id'] = merged_df['order_item_id'].fillna(0)
+# Pastikan kolom 'product_category_name_english' ada
+if 'product_category_name_english' not in merged_df.columns:
+    st.error("Kolom 'product_category_name_english' tidak ditemukan setelah penggabungan!")
+else:
+    # Pastikan tidak ada nilai NaN di kolom 'price' atau 'order_item_id'
+    merged_df['price'] = merged_df['price'].fillna(0)
+    merged_df['order_item_id'] = merged_df['order_item_id'].fillna(0)
 
-# Menghitung total pendapatan
-merged_df['total_revenue'] = merged_df['price'] * merged_df['order_item_id']
+    # Menghitung total pendapatan
+    merged_df['total_revenue'] = merged_df['price'] * merged_df['order_item_id']
 
-# Menghitung total pendapatan per kategori produk
-revenue_per_category = merged_df.groupby('product_category_name_translations_df')['total_revenue'].sum().reset_index()
-revenue_per_category = revenue_per_category.sort_values(by='total_revenue', ascending=False)
+    # Menghitung total pendapatan per kategori produk
+    revenue_per_category = merged_df.groupby('product_category_name_english')['total_revenue'].sum().reset_index()
+    revenue_per_category = revenue_per_category.sort_values(by='total_revenue', ascending=False)
 
-# Menentukan warna khusus untuk kategori dengan pendapatan tertinggi
-revenue_per_category['color'] = ['#5B9BD5' if i == 0 else '#A2C4E4' for i in range(len(revenue_per_category))]
+    # Menentukan warna khusus untuk kategori dengan pendapatan tertinggi
+    revenue_per_category['color'] = ['#5B9BD5' if i == 0 else '#A2C4E4' for i in range(len(revenue_per_category))]
 
-# Membatasi hanya 10 kategori teratas
-top_10_revenue = revenue_per_category.head(10)
+    # Membatasi hanya 10 kategori teratas
+    top_10_revenue = revenue_per_category.head(10)
 
-# Plot
-fig, ax = plt.subplots(figsize=(12, 6))
-sns.barplot(
-    x='total_revenue',
-    y='product_category_name_english',
-    data=top_10_revenue,
-    palette=top_10_revenue['color'],
-    ax=ax
-)
-ax.set_title('Top 10 Product Categories by Total Revenue')
-ax.set_xlabel('')
-ax.set_ylabel('')
-plt.xticks(rotation=45, ha='right')
-plt.tight_layout()
-st.pyplot(fig)
+    # Plot
+    fig, ax = plt.subplots(figsize=(12, 6))
+    sns.barplot(
+        x='total_revenue',
+        y='product_category_name_english',
+        data=top_10_revenue,
+        palette=top_10_revenue['color'],
+        ax=ax
+    )
+    ax.set_title('Top 10 Product Categories by Total Revenue')
+    ax.set_xlabel('')
+    ax.set_ylabel('')
+    plt.xticks(rotation=45, ha='right')
+    plt.tight_layout()
+    st.pyplot(fig)
