@@ -107,40 +107,13 @@ with col6:
 # Visualisasi
 st.header("Pertanyaan Bisnis")
 
-# P1: Jumlah Order Berdasarkan State
-st.subheader("P1: Jumlah Order Berdasarkan State")
-order_state_count = filtered_orders.groupby('customer_state')['order_id'].count().reset_index()
-order_state_count.columns = ['State', 'Total Orders']
+st.subheader("P1: Kategori Produk Terpopuler Berdasarkan Jumlah Pesanan")
+top_categories = order_items_df.groupby('product_category_name_english')['order_id'].count().reset_index()
+top_categories = top_categories.sort_values(by='order_id', ascending=False).head(5)
+top_categories.columns = ['Product Category', 'Total Orders']
 
 fig, ax = plt.subplots(figsize=(10, 6))
-sns.barplot(data=order_state_count.sort_values('Total Orders', ascending=False), 
-            x='State', y='Total Orders', palette=['#5B9BD5' if i == 0 else '#A2C4E4' for i in range(len(order_state_count))], ax=ax)
-plt.title("Jumlah Order Berdasarkan State")
+sns.barplot(data=top_categories, x='Product Category', y='Total Orders', palette=['#5B9BD5' if i == 0 else '#A2C4E4' for i in range(len(top_categories))], ax=ax)
+plt.title("Top Kategori Produk Berdasarkan Jumlah Pesanan")
 plt.xticks(rotation=45)
-st.pyplot(fig)
-
-# P2: Pertumbuhan Order per Tahun
-st.subheader("P2: Pertumbuhan Order per Tahun")
-filtered_orders['year'] = filtered_orders['order_purchase_timestamp'].dt.year
-orders_per_year = filtered_orders.groupby('year')['order_id'].count().reset_index()
-orders_per_year.columns = ['Year', 'Total Orders']
-
-fig, ax = plt.subplots(figsize=(10, 6))
-sns.lineplot(data=orders_per_year, x='Year', y='Total Orders', marker="o", ax=ax)
-plt.title("Pertumbuhan Order per Tahun")
-plt.xlabel("Tahun")
-plt.ylabel("Jumlah Order")
-st.pyplot(fig)
-
-# P3: Customer Active vs Inactive
-st.subheader("P3: Customer Active vs Inactive")
-customer_status = pd.DataFrame({
-    "Status": ["Active", "Inactive"],
-    "Count": [filtered_orders['customer_id'].nunique(), 
-              customers_df['customer_id'].nunique() - filtered_orders['customer_id'].nunique()]
-})
-
-fig, ax = plt.subplots(figsize=(10, 6))
-ax.pie(customer_status['Count'], labels=customer_status['Status'], autopct='%1.1f%%', colors=["#5B9BD5", "#A2C4E4"])
-plt.title("Customer Active vs Inactive")
 st.pyplot(fig)
