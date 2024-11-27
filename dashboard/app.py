@@ -171,7 +171,7 @@ merged_df = pd.merge(order_items_df, products_df, on='product_id', how='left')
 merged_df = pd.merge(merged_df, product_category_name_translations_df, on='product_category_name', how='left')
 
 # Mengganti nama kolom hasil merge untuk konsistensi
-merged_df.rename(columns={'product_category_name_english': 'product_category_name_english'}, inplace=True)
+merged_df.rename(columns={'product_category_name_translations': 'product_category_name_english'}, inplace=True)
 
 # Pastikan tidak ada nilai NaN di kolom 'price' atau 'order_item_id'
 merged_df['price'] = merged_df['price'].fillna(0)
