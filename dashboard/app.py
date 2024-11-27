@@ -165,28 +165,33 @@ st.pyplot(fig)
 
 st.subheader("P3: Top 10 Kategori Produk Berdasarkan Total Pendapatan")
 
-# Menghitung total pendapatan per kategori produk
+# Menggabungkan data untuk perhitungan total pendapatan
 merged_df = pd.merge(order_items_df, products_df, on='product_id', how='left')
 merged_df = pd.merge(merged_df, product_category_name_translations_df, on='product_category_name', how='left')
 merged_df['total_revenue'] = merged_df['price'] * merged_df['order_item_id']
+
+# Menghitung total pendapatan per kategori produk
 revenue_per_category = merged_df.groupby('product_category_name_english')['total_revenue'].sum().reset_index()
 revenue_per_category = revenue_per_category.sort_values(by='total_revenue', ascending=False)
 
-# Menentukan warna untuk kategori dengan pendapatan tertinggi
-colors = ['#5B9BD5' if i == 0 else '#A2C4E4' for i in range(len(revenue_per_category))]
+# Menentukan warna khusus untuk kategori dengan pendapatan tertinggi
+revenue_per_category['color'] = ['#5B9BD5' if i == 0 else '#A2C4E4' for i in range(len(revenue_per_category))]
+
+# Membatasi hanya 10 kategori teratas
+top_10_revenue = revenue_per_category.head(10)
 
 # Plot
 fig, ax = plt.subplots(figsize=(12, 6))
 sns.barplot(
     x='total_revenue',
     y='product_category_name_english',
-    data=revenue_per_category.head(10),
-    palette=colors[:10],
+    data=top_10_revenue,
+    palette=top_10_revenue['color'],
     ax=ax
 )
 ax.set_title('Top 10 Product Categories by Total Revenue')
-ax.set_xlabel('')
-ax.set_ylabel('')
+ax.set_xlabel('')  # Menghapus label sumbu x
+ax.set_ylabel('')  # Menghapus label sumbu y
 plt.xticks(rotation=45, ha='right')
-plt.tight_layout()
+plt.tight_layout()  # Memastikan layout rapi
 st.pyplot(fig)
