@@ -164,10 +164,20 @@ plt.tight_layout()
 st.pyplot(fig)
 
 st.subheader("P3: Top 10 Kategori Produk Berdasarkan Total Pendapatan")
+st.write("Visualisasi kategori produk dengan total pendapatan tertinggi.")
 
 # Menggabungkan data untuk perhitungan total pendapatan
 merged_df = pd.merge(order_items_df, products_df, on='product_id', how='left')
 merged_df = pd.merge(merged_df, product_category_name_translations_df, on='product_category_name', how='left')
+
+# Mengganti nama kolom hasil merge untuk konsistensi
+merged_df.rename(columns={'product_category_name_english': 'product_category_name_english'}, inplace=True)
+
+# Pastikan tidak ada nilai NaN di kolom 'price' atau 'order_item_id'
+merged_df['price'] = merged_df['price'].fillna(0)
+merged_df['order_item_id'] = merged_df['order_item_id'].fillna(0)
+
+# Menghitung total pendapatan
 merged_df['total_revenue'] = merged_df['price'] * merged_df['order_item_id']
 
 # Menghitung total pendapatan per kategori produk
@@ -190,8 +200,8 @@ sns.barplot(
     ax=ax
 )
 ax.set_title('Top 10 Product Categories by Total Revenue')
-ax.set_xlabel('')  # Menghapus label sumbu x
-ax.set_ylabel('')  # Menghapus label sumbu y
+ax.set_xlabel('')
+ax.set_ylabel('')
 plt.xticks(rotation=45, ha='right')
-plt.tight_layout()  # Memastikan layout rapi
+plt.tight_layout()
 st.pyplot(fig)
