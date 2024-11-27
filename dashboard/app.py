@@ -163,24 +163,36 @@ plt.xticks(rotation=45)
 plt.tight_layout()
 st.pyplot(fig)
 
-st.subheader("P3: Top 10 Kategori Produk Berdasarkan Total Pendapatan")
-# Calculate total revenue per product category
-merged_df = pd.merge(order_items_df, products_df, on='product_id', how='left')
-merged_df = pd.merge(merged_df, product_category_name_translations_df, on='product_category_name', how='left')
-merged_df['total_revenue'] = merged_df['price'] * merged_df['order_item_id']
-revenue_per_category = merged_df.groupby('product_category_name_english')['total_revenue'].sum().reset_index()
-revenue_per_category = revenue_per_category.sort_values(by='total_revenue', ascending=False)
+st.subheader("P4: Top 10 State dengan Jumlah Pelanggan Terbanyak")
 
-# Visualization
-plt.figure(figsize=(12, 6))
+# Menggabungkan orders_df dengan customers_df untuk mendapatkan data state pelanggan
+merged_order_customer_df = pd.merge(orders_df, customers_df, on='customer_id', how='left')
 
-# Define custom color palette
-colors = ['#5B9BD5' if i == revenue_per_category['total_revenue'].idxmax() else '#A2C4E4' for i in revenue_per_category.index]
+# Menghitung jumlah pelanggan unik per state
+top_10_customers = (
+    merged_order_customer_df.groupby('customer_state')['customer_id']
+    .nunique()
+    .sort_values(ascending=False)
+    .head(10)
+    .reset_index()
+)
+top_10_customers.rename(columns={'customer_id': 'total_customer'}, inplace=True)
 
-sns.barplot(x='total_revenue', y='product_category_name_english', data=revenue_per_category.head(10), palette=colors)
+# Menentukan warna untuk state dengan jumlah pelanggan tertinggi
+top_color = ['#5B9BD5' if i == 0 else '#A2C4E4' for i in range(len(top_10_customers))]
+
+# Plot
+fig, ax = plt.subplots(figsize=(12, 6))
+sns.barplot(
+    x='customer_state',
+    y='total_customer',
+    data=top_10_customers,
+    palette=top_color,
+    ax=ax
+)
+ax.set_title('Top Customer States by Total Customer')
+ax.set_xlabel('')
+ax.set_ylabel('')
 plt.xticks(rotation=45, ha='right')
-plt.title('Top 10 Product Categories by Total Revenue')
-plt.xlabel('')
-plt.ylabel('')
 plt.tight_layout()
-plt.show()
+st.pyplot(fig)
