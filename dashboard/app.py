@@ -162,3 +162,28 @@ ax.set_ylabel('')
 plt.xticks(rotation=45)
 plt.tight_layout()
 st.pyplot(fig)
+
+st.subheader("P4: Dari Daerah Mana Pelanggan Terbanyak Berasal?")
+
+# Menghitung jumlah pelanggan unik per state
+customer_by_state = customers_df.groupby('customer_state')['customer_id'].nunique().reset_index()
+customer_by_state.rename(columns={'customer_id': 'total_customers'}, inplace=True)
+top_10_states = customer_by_state.sort_values(by='total_customers', ascending=False).head(10)
+
+# Menentukan warna
+top_10_states['color'] = ['#5B9BD5' if i == 0 else '#A2C4E4' for i in range(len(top_10_states))]
+
+# Plot
+fig, ax = plt.subplots(figsize=(12, 6))
+sns.barplot(
+    x='total_customers',
+    y='customer_state',
+    data=top_10_states,
+    palette=top_10_states['color'],
+    ax=ax
+)
+ax.set_title('Top 10 State Berdasarkan Jumlah Pelanggan')
+ax.set_xlabel('')
+ax.set_ylabel('')
+plt.tight_layout()
+st.pyplot(fig)
