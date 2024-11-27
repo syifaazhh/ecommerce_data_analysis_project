@@ -163,33 +163,6 @@ plt.xticks(rotation=45)
 plt.tight_layout()
 st.pyplot(fig)
 
-st.subheader("P3: Produk dengan Total Pendapatan Tertinggi")
-
-# Menghitung total pendapatan per produk
-revenue_per_product = order_items_df.groupby('product_id')['price'].sum().reset_index()
-revenue_per_product = pd.merge(revenue_per_product, products_df, on='product_id', how='left')
-revenue_per_product = pd.merge(revenue_per_product, product_category_name_translations_df, on='product_category_name', how='left')
-revenue_per_product.rename(columns={'price': 'total_revenue'}, inplace=True)
-top_10_products = revenue_per_product.sort_values(by='total_revenue', ascending=False).head(10)
-
-# Menentukan warna
-top_10_products['color'] = ['#5B9BD5' if i == 0 else '#A2C4E4' for i in range(len(top_10_products))]
-
-# Plot
-fig, ax = plt.subplots(figsize=(12, 6))
-sns.barplot(
-    x='total_revenue',
-    y='product_category_name_english',
-    data=top_10_products,
-    palette=top_10_products['color'],
-    ax=ax
-)
-ax.set_title('Top 10 Produk Berdasarkan Total Pendapatan')
-ax.set_xlabel('')
-ax.set_ylabel('')
-plt.tight_layout()
-st.pyplot(fig)
-
 st.subheader("P4: Dari Daerah Mana Pelanggan Terbanyak Berasal?")
 
 # Menghitung jumlah pelanggan unik per state
@@ -378,3 +351,5 @@ ax.set_xlabel('Jumlah Keterlambatan')
 ax.set_ylabel('')
 plt.tight_layout()
 st.pyplot(fig)
+
+st.caption('Copyright (C) Syifa Azzahirah. 2024')
