@@ -181,7 +181,7 @@ merged_df['order_item_id'] = merged_df['order_item_id'].fillna(0)
 merged_df['total_revenue'] = merged_df['price'] * merged_df['order_item_id']
 
 # Menghitung total pendapatan per kategori produk
-revenue_per_category = merged_df.groupby('product_category_name_translations')['total_revenue'].sum().reset_index()
+revenue_per_category = merged_df.groupby('product_category_name_translations_df')['total_revenue'].sum().reset_index()
 revenue_per_category = revenue_per_category.sort_values(by='total_revenue', ascending=False)
 
 # Menentukan warna khusus untuk kategori dengan pendapatan tertinggi
