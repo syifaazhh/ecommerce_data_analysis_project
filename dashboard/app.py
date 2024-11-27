@@ -108,123 +108,39 @@ with col6:
 st.header("Pertanyaan Bisnis")
 
 # P1: Jumlah Order Berdasarkan State
-with st.expander("P1: Jumlah Order Berdasarkan State"):
-    tab1, tab2 = st.tabs(['Terbanyak', 'Tersedikit'])
-    with tab1:
-        top_state_df = order_per_state_df.sort_values(by='total_order', ascending=False).head(5)
-        fig, ax = plt.subplots(figsize=(10, 6))
-        sns.barplot(data=top_state_df, x='state', y='total_order', ax=ax, palette="Blues_d")
-        plt.title("Top States Berdasarkan Order")
-        st.pyplot(fig)
-    with tab2:
-        worst_state_df = order_per_state_df.sort_values(by='total_order').head(5)
-        fig, ax = plt.subplots(figsize=(10, 6))
-        sns.barplot(data=worst_state_df, x='state', y='total_order', ax=ax, palette="Reds_d")
-        plt.title("State dengan Order Tersedikit")
-        st.pyplot(fig)
+st.subheader("P1: Jumlah Order Berdasarkan State")
+order_state_count = filtered_orders.groupby('customer_state')['order_id'].count().reset_index()
+order_state_count.columns = ['State', 'Total Orders']
+
+fig, ax = plt.subplots(figsize=(10, 6))
+sns.barplot(data=order_state_count.sort_values('Total Orders', ascending=False), 
+            x='State', y='Total Orders', palette=['#5B9BD5' if i == 0 else '#A2C4E4' for i in range(len(order_state_count))], ax=ax)
+plt.title("Jumlah Order Berdasarkan State")
+plt.xticks(rotation=45)
+st.pyplot(fig)
 
 # P2: Pertumbuhan Order per Tahun
-with st.expander("P2: Pertumbuhan Order per Tahun"):
-    fig, ax = plt.subplots(figsize=(10, 6))
-    sns.lineplot(data=order_per_year_df, x='year_of_purchase', y='total_order', marker="o", ax=ax)
-    plt.title("Jumlah Order per Tahun")
-    plt.xlabel("Tahun")
-    plt.ylabel("Jumlah Order")
-    st.pyplot(fig)
+st.subheader("P2: Pertumbuhan Order per Tahun")
+filtered_orders['year'] = filtered_orders['order_purchase_timestamp'].dt.year
+orders_per_year = filtered_orders.groupby('year')['order_id'].count().reset_index()
+orders_per_year.columns = ['Year', 'Total Orders']
+
+fig, ax = plt.subplots(figsize=(10, 6))
+sns.lineplot(data=orders_per_year, x='Year', y='Total Orders', marker="o", ax=ax)
+plt.title("Pertumbuhan Order per Tahun")
+plt.xlabel("Tahun")
+plt.ylabel("Jumlah Order")
+st.pyplot(fig)
 
 # P3: Customer Active vs Inactive
-with st.expander("P3: Customer Active vs Inactive"):
-    fig, ax = plt.subplots(figsize=(10, 6))
-    ax.pie(customer_status_df['total_customer'], labels=customer_status_df['status'], autopct='%1.1f%%', explode=(0.1, 0), colors=["#72BCD4", "#D3D3D3"])
-    plt.title("Rasio Customer Active vs Inactive")
-    st.pyplot(fig)
+st.subheader("P3: Customer Active vs Inactive")
+customer_status = pd.DataFrame({
+    "Status": ["Active", "Inactive"],
+    "Count": [filtered_orders['customer_id'].nunique(), 
+              customers_df['customer_id'].nunique() - filtered_orders['customer_id'].nunique()]
+})
 
-# P4: Distribusi Rating Ulasan
-with st.expander("P4: Distribusi Rating Ulasan"):
-    fig, ax = plt.subplots(figsize=(10, 6))
-    sns.barplot(data=review_score_df, x='review_score', y='total_review', palette="RdYlGn", ax=ax)
-    plt.title("Distribusi Rating Ulasan")
-    plt.xlabel("Rating")
-    plt.ylabel("Total Review")
-    st.pyplot(fig)
-
-# P5: Kategori Produk Terpopuler
-with st.expander("P5: Kategori Produk Terpopuler"):
-    best_category_df = order_product_category_df.sort_values(by='total_order', ascending=False).head(5)
-    fig, ax = plt.subplots(figsize=(10, 6))
-    sns.barplot(data=best_category_df, x='product_category_name_english', y='total_order', palette="coolwarm", ax=ax)
-    plt.title("Top 5 Kategori Produk")
-    plt.xlabel("Kategori Produk")
-    plt.ylabel("Jumlah Order")
-    st.pyplot(fig)
-
-# P6: Metode Pembayaran Paling Sering Digunakan
-with st.expander("P6: Metode Pembayaran Paling Sering Digunakan"):
-    payment_methods = order_payments_df['payment_type'].value_counts().reset_index()
-    payment_methods.columns = ['payment_type', 'count']
-    fig, ax = plt.subplots(figsize=(10, 6))
-    sns.barplot(data=payment_methods, x='count', y='payment_type', palette="Purples_d", ax=ax)
-    plt.title("Distribusi Metode Pembayaran")
-    plt.xlabel("Jumlah")
-    plt.ylabel("Metode Pembayaran")
-    st.pyplot(fig)
-
-# P7: Waktu Pengiriman Berdasarkan Metode Pembayaran
-with st.expander("P7: Hubungan Metode Pembayaran dan Waktu Pengiriman"):
-    orders_payments = pd.merge(order_payments_df, orders_df, on='order_id', how='left')
-    orders_payments['delivery_time'] = (orders_payments['order_delivered_customer_date'] - orders_payments['order_purchase_timestamp']).dt.days
-    fig, ax = plt.subplots(figsize=(10, 6))
-    sns.boxplot(data=orders_payments, x='payment_type', y='delivery_time', palette="coolwarm", ax=ax)
-    plt.title("Waktu Pengiriman Berdasarkan Metode Pembayaran")
-    plt.xlabel("Metode Pembayaran")
-    plt.ylabel("Waktu Pengiriman (Hari)")
-    st.pyplot(fig)
-
-# P8: Distribusi Rating Ulasan
-with st.expander("P8: Distribusi Rating Ulasan"):
-    fig, ax = plt.subplots(figsize=(10, 6))
-    sns.barplot(data=review_score_df, x='review_score', y='total_review', palette="RdYlGn", ax=ax)
-    plt.title("Distribusi Rating Ulasan")
-    plt.xlabel("Rating")
-    plt.ylabel("Jumlah Ulasan")
-    st.pyplot(fig)
-
-# P9: Perbedaan Waktu Pengiriman Berdasarkan Ulasan
-with st.expander("P9: Waktu Pengiriman Berdasarkan Ulasan Positif vs Negatif"):
-    orders_reviews = pd.merge(order_reviews_df, orders_df, on='order_id', how='left')
-    orders_reviews['delivery_time'] = (orders_reviews['order_delivered_customer_date'] - orders_reviews['order_purchase_timestamp']).dt.days
-    orders_reviews['sentiment'] = orders_reviews['review_score'].apply(lambda x: "Positive" if x >= 4 else "Negative")
-    fig, ax = plt.subplots(figsize=(10, 6))
-    sns.boxplot(data=orders_reviews, x='sentiment', y='delivery_time', palette="coolwarm", ax=ax)
-    plt.title("Waktu Pengiriman Berdasarkan Sentimen Ulasan")
-    plt.xlabel("Sentimen Ulasan")
-    plt.ylabel("Waktu Pengiriman (Hari)")
-    st.pyplot(fig)
-
-# P10: Rata-Rata Waktu Pengiriman Berdasarkan Kategori Produk
-with st.expander("P10: Rata-Rata Waktu Pengiriman Berdasarkan Kategori Produk"):
-    order_items_product_df['delivery_time'] = (
-        pd.to_datetime(order_items_product_df['order_delivered_customer_date']) -
-        pd.to_datetime(order_items_product_df['order_purchase_timestamp'])
-    ).dt.days
-    avg_delivery = order_items_product_df.groupby('product_category_name_english')['delivery_time'].mean().sort_values(ascending=False).head(10)
-    fig, ax = plt.subplots(figsize=(12, 8))
-    sns.barplot(y=avg_delivery.index, x=avg_delivery.values, palette="coolwarm", ax=ax)
-    plt.title("Rata-Rata Waktu Pengiriman Berdasarkan Kategori Produk")
-    plt.xlabel("Waktu Pengiriman (Hari)")
-    plt.ylabel("Kategori Produk")
-    st.pyplot(fig)
-
-# P11: Keterlambatan Pengiriman Berdasarkan Kategori Produk
-with st.expander("P11: Keterlambatan Pengiriman Berdasarkan Kategori Produk"):
-    order_items_product_df['is_late'] = order_items_product_df['delivery_time'] > (
-        pd.to_datetime(order_items_product_df['order_estimated_delivery_date']) -
-        pd.to_datetime(order_items_product_df['order_purchase_timestamp'])
-    ).dt.days
-    late_delivery = order_items_product_df[order_items_product_df['is_late']].groupby('product_category_name_english').size().sort_values(ascending=False).head(10)
-    fig, ax = plt.subplots(figsize=(12, 8))
-    sns.barplot(y=late_delivery.index, x=late_delivery.values, palette="Reds_d", ax=ax)
-    plt.title("Keterlambatan Pengiriman Berdasarkan Kategori Produk")
-    plt.xlabel("Jumlah Keterlambatan")
-    plt.ylabel("Kategori Produk")
-    st.pyplot(fig)
+fig, ax = plt.subplots(figsize=(10, 6))
+ax.pie(customer_status['Count'], labels=customer_status['Status'], autopct='%1.1f%%', colors=["#5B9BD5", "#A2C4E4"])
+plt.title("Customer Active vs Inactive")
+st.pyplot(fig)
