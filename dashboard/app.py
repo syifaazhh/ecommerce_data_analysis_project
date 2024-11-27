@@ -123,7 +123,8 @@ ax.set_xlabel('')
 ax.set_ylabel('')
 st.pyplot(fig)
 
-st.subheader("P2: Tren Penjualan Tahunan")
+st.subheader("P2: Bagaimana pola pembelian harian, mingguan, atau bulanan? Apakah ada waktu tertentu dengan volume penjualan yang tinggi?")
+st.write("a. Tren Penjualan Tahunan")
 # Hitung jumlah pesanan per tahun
 orders_df['purchase_year'] = orders_df['order_purchase_timestamp'].dt.year
 orders_per_year = orders_df.groupby('purchase_year')['order_id'].count().reset_index()
@@ -136,5 +137,21 @@ ax.set_title('Total Orders per Year')
 ax.set_xlabel('')
 ax.set_ylabel('')
 ax.set_xticks([2016, 2017, 2018])
+plt.tight_layout()
+st.pyplot(fig)
+
+st.write("b. Tren Penjualan Bulanan")
+# Hitung jumlah pesanan per bulan
+orders_df['purchase_month'] = orders_df['order_purchase_timestamp'].dt.to_period('M').astype(str)
+orders_per_month = orders_df.groupby('purchase_month')['order_id'].count().reset_index()
+orders_per_month.columns = ['purchase_month', 'total_orders']
+
+# Plot
+fig, ax = plt.subplots(figsize=(15, 6))
+sns.lineplot(data=orders_per_month, x='purchase_month', y='total_orders', marker='o', ax=ax)
+ax.set_title('Total Orders per Month')
+ax.set_xlabel('')
+ax.set_ylabel('')
+plt.xticks(rotation=45)
 plt.tight_layout()
 st.pyplot(fig)
